@@ -1,1 +1,1 @@
-# fundamentals_of_image_compression
+# Fundamentals_of_image_compression
