@@ -1,5 +1,6 @@
 # Exercise 2b: Bilinear Transformation
 
+from PIL import Image
 import numpy as np
 
 def scale_bilinear(img, factor):
@@ -32,3 +33,9 @@ def scale_bilinear(img, factor):
     bot = Ic * (1 - wx) + Id * wx
     out = top * (1 - wy) + bot * wy
     return np.clip(out, 0, 255).astype(np.uint8).reshape(nh, nw, ch).squeeze()
+
+shirt = np.array(Image.open("../Images/shirt_small.jpg"))
+print("Original size:", shirt.shape)
+
+bl = scale_bilinear(shirt, 4)
+Image.fromarray(bl).save("shirt_bilinear_x4.png")
