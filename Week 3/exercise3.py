@@ -48,3 +48,14 @@ shirt = np.asarray(Image.open("Images/shirt.jpg").convert("RGB"), dtype=np.float
 blurred = convolve(shirt, gaussian)
 Image.fromarray(np.clip(blurred, 0, 255).astype(np.uint8)).save("shirt_blurred.png")
 print("blurred saved:", blurred.shape)
+
+img17 = np.asarray(Image.open("Images/17.png").convert("RGB"), dtype=np.float64)
+blur = convolve(img17, gaussian)
+mask = img17 - blur
+sharp = img17 + 1.0 * mask
+sharp = np.clip(sharp, 0, 255).astype(np.uint8)
+
+Image.fromarray(sharp).save("17_sharpened.png")
+# the mask is contrast-stretched to 0..255, only for display
+disp = mask - mask.min(); disp = disp / disp.max() * 255
+Image.fromarray(disp.astype(np.uint8)).save("17_mask.png")
