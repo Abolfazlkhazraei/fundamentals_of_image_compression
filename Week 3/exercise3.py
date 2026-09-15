@@ -2,6 +2,7 @@ import numpy as np
 from PIL import Image
 
 # Exercise 3a Expanding image for convolution filtering
+
 def expand_image(img, pad=2):
     """Expand the image by `pad` pixels on every edge, copying the adjacent
     (nearest) edge pixel. Works for 2D (grayscale) or 3D (color) arrays."""
@@ -49,13 +50,34 @@ blurred = convolve(shirt, gaussian)
 Image.fromarray(np.clip(blurred, 0, 255).astype(np.uint8)).save("shirt_blurred.png")
 print("blurred saved:", blurred.shape)
 
+# Exercise 3c Unsharp Masking
+
 img17 = np.asarray(Image.open("Images/17.png").convert("RGB"), dtype=np.float64)
 blur = convolve(img17, gaussian)
-mask = img17 - blur
-sharp = img17 + 1.0 * mask
+mask = img17 - blur            # unsharp mask = original - blurred
+sharp = img17 + 1.0 * mask     # add mask back with multiplier 1
 sharp = np.clip(sharp, 0, 255).astype(np.uint8)
 
 Image.fromarray(sharp).save("17_sharpened.png")
 # the mask is contrast-stretched to 0..255, only for display
 disp = mask - mask.min(); disp = disp / disp.max() * 255
 Image.fromarray(disp.astype(np.uint8)).save("17_mask.png")
+
+# Exercise 3d Anti-alias
+
+def scale_nearest(img, factor):
+    """Downscale by nearest-neighbour sampling (from Week 2)."""
+    img = np.asarray(img)
+    H, W = img.shape[:2]
+    nh, nw = int(H * factor), int(W * factor)
+    ys = (np.arange(nh) / factor).astype(int).clip(0, H - 1)
+    xs = (np.arange(nw) / factor).astype(int).clip(0, W - 1)
+    return img[np.ix_(ys, xs, np.arange(img.shape[2]))]
+
+factor = 0.17
+direct = scale_nearest(shirt, factor)               # Scale directly
+prefiltered = convolve(shirt, gaussian)             # Gaussian 5x5 first
+antialiased =  scale_nearest(prefiltered, factor)   # Then scale to 0.17
+
+Image.fromarray(np.clip(direct, 0, 255).astype(np.uint8)).save("shirt_scaled_noAA.png")
+Image.fromarray(np.clip(antialiased, 0, 255).astype(np.uint8)).save("shirt_scaled_AA.png")
