@@ -12,11 +12,14 @@ titles = ["vl.png (vertical lines)",
 fig, axes = plt.subplots(3, 2, figsize=(10, 12))
 
 for row, (fn, title) in enumerate(zip(files, titles)):
+    # Load and convert to grayscale
     arr = np.asarray(Image.open(fn).convert("L"), dtype=float)
 
+    # 2-D FFT, shift 0-frequency to the centre
     F = np.fft.fft2(arr)
     F_shifted = np.fft.fftshift(F)
 
+    # Logarithmic magnitude for display
     visual_spectrum = np.log(1 + np.abs(F_shifted))
 
     axes[row, 0].imshow(arr, cmap="gray")
